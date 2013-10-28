@@ -25,21 +25,18 @@ define(function(require) {
 
   _.extend(Query.prototype, {
 
-    fields: function(/* field1, ... */) {
-      if (this._type != TYPE_SELECT) {
-        throw 'Not supported for query type:' + this._type;
-      }
+    field: function(key, value) {
       if (arguments.length == 0) {
         throw 'No field name specified';
       }
-      _.each(arguments, function(arg) {
-        this._fields.set(arg);
-      }, this);
+      if (this._type == TYPE_SELECT) {
+        _.each(arguments, function(arg) {
+          this._fields.set(arg);
+        }, this);
+      } else {
+        this._fields.set(key, value);
+      }
       return this;
-    },
-
-    field: function(key, value) {
-      this._fields.set(key, value);
     },
 
     tables: function(/* table1, ... */) {

@@ -26,7 +26,7 @@ define(function(require) {
 
     it('can add fields to query', function() {
       var query = jaqb.select('t1');
-      query.fields('first').fields('second', 'third');
+      query.field('first').field('second', 'third');
       expect(query.toString()).toEqual('SELECT first, second, third FROM t1');
     });
 
@@ -70,8 +70,8 @@ define(function(require) {
 
       query = jaqb.insert('t1');
       query.field('first', 1);
-      query.field('second', 2);
-      expect(query.toString()).toEqual("INSERT INTO t1 (first, second) VALUES ('1', '2')");
+      query.field('second', 2).field('third', 3);
+      expect(query.toString()).toEqual("INSERT INTO t1 (first, second, third) VALUES ('1', '2', '3')");
     });
 
   });
