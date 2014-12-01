@@ -1,6 +1,7 @@
 {
   "name": "jaqb",
   "version": "0.0.1",
+  "main": "src/jaqb.js",
   "description": "JavaScript Query Builder for SQLite",
   "dependencies": {
     "underscore": "*"
