@@ -15,7 +15,7 @@ define(function(require) {
     beforeEach(function() {
     });
 
-    it('can create select query', function() {
+    it('can generate select query', function() {
       var query = jaqb.select('t1');
       expect(query.toString()).toEqual('SELECT * FROM t1');
 
@@ -63,7 +63,7 @@ define(function(require) {
       );
     });
 
-    it('can create insert query', function() {
+    it('can generate insert query', function() {
       var query = jaqb.insert('t1');
       query.field('first', 1);
       expect(query.toString()).toEqual("INSERT INTO t1 (first) VALUES ('1')");
@@ -74,5 +74,24 @@ define(function(require) {
       expect(query.toString()).toEqual("INSERT INTO t1 (first, second, third) VALUES ('1', '2', '3')");
     });
 
+    it('can generate create table query', function() {
+      var query = jaqb.create('t1');
+      expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 ()');
+
+      query.field('f1');
+      expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 (f1 TEXT)');
+
+      query.field('f2');
+      expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 (f1 TEXT, f2 TEXT)');
+
+      query.field('f3', 'INTEGER');
+      expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 (f1 TEXT, f2 TEXT, f3 INTEGER)');
+    });
+
+    it('can generate create table query with primary key', function() {
+      var query = jaqb.create('t1');
+      query.fields().primaryKey('f1');
+      expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 (f1 INTEGER PRIMARY KEY)');
+    });
   });
 });

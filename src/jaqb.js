@@ -10,16 +10,22 @@
   function injectDependencies(_) {
     var TYPE_SELECT = 'SELECT';
     var TYPE_INSERT = 'INSERT';
+    var TYPE_CREATE = 'CREATE';
 
     function Query(type, tables) {
 
       // select, insert
       this._type = type;
       this._tables = tables || [];
-      if (this._type == TYPE_INSERT) {
-        this._fields = new InsertFields();
-      } else {
-        this._fields = new QueryFields();
+      switch (this._type) {
+        case TYPE_SELECT:
+          this._fields = new QueryFields();
+          break;
+        case TYPE_INSERT:
+          this._fields = new InsertFields();
+          break;
+        case TYPE_CREATE:
+          this._fields = new CreateFields();
       }
     }
 
@@ -37,6 +43,10 @@
           this._fields.set(key, value);
         }
         return this;
+      },
+
+      fields: function() {
+        return this._fields;
       },
 
       tables: function (/* table1, ... */) {
@@ -76,6 +86,10 @@
 
           case TYPE_INSERT:
             s = this._type + ' INTO ' + this._tables[0] + ' ' + this._fields.toString();
+            break;
+
+          case TYPE_CREATE:
+            s = 'CREATE TABLE IF NOT EXISTS ' + this._tables[0] + ' (' + this._fields.toString() + ')';
             break;
         }
         return s;
@@ -123,6 +137,43 @@
         }
         var fields = this._fields.join(', ');
         return fields;
+      }
+    });
+
+    function CreateFields(fields) {
+
+      // TODO: ensure incoming fields is an object
+      this._fields = fields || {};
+    }
+
+    _.extend(CreateFields.prototype, {
+      primaryKey: function(field) {
+        this.set(field, 'PRIMARY');
+      },
+
+      set: function (field, type) {
+        switch (type) {
+          default:
+            type = 'TEXT';
+          case 'TEXT':
+          case 'INTEGER':
+          case 'BLOB':
+          case 'REAL':
+            break;
+          case 'PRIMARY':
+            type = 'INTEGER PRIMARY KEY';
+            break;
+
+        }
+        this._fields[field] = type;
+      },
+
+      toString: function () {
+        var fields = [];
+        _.each(this._fields, function(val, key) {
+          fields.push(key + ' ' + val);
+        });
+        return fields.join(', ');
       }
     });
 
@@ -213,9 +264,17 @@
       return new Query(TYPE_INSERT, _.toArray(arguments));
     }
 
+    function create(/* table */) {
+      if (arguments.length == 0) {
+        throw 'Missing create table';
+      }
+      return new Query(TYPE_CREATE, _.toArray(arguments));
+    }
+
     return {
       select: select,
-      insert: insert
+      insert: insert,
+      create: create
     }
   }
 
