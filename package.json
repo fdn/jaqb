@@ -1,0 +1,15 @@
+{
+  "name": "jaqb",
+  "version": "0.0.1",
+  "description": "JavaScript Query Builder for SQLite",
+  "dependencies": {
+    "underscore": "*"
+  },
+  "devDependencies": {
+    "sqlite3": "*"
+  },
+  "scripts": {
+    "start": "python -m SimpleHTTPServer"
+  },
+  "private": true
+}
