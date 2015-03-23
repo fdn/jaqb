@@ -10,6 +10,7 @@
   function injectDependencies(_) {
     var TYPE_SELECT = 'SELECT';
     var TYPE_INSERT = 'INSERT';
+    var TYPE_UPDATE = 'UPDATE';
     var TYPE_CREATE = 'CREATE';
 
     function Query(type, tables) {
@@ -23,6 +24,9 @@
           break;
         case TYPE_INSERT:
           this._fields = new InsertFields();
+          break;
+        case TYPE_UPDATE:
+          this._fields = new UpdateFields();
           break;
         case TYPE_CREATE:
           this._fields = new CreateFields();
@@ -65,7 +69,7 @@
         }
 
         // @note: saving for future use
-        throw 'Not supported';
+        throw 'where(args): Not supported';
       },
 
       /**
@@ -86,6 +90,16 @@
 
           case TYPE_INSERT:
             s = this._type + ' INTO ' + this._tables[0] + ' ' + this._fields.toString();
+            break;
+
+          case TYPE_UPDATE:
+            s = this._type + ' ' + this._tables[0] + ' SET ' + this._fields.toString();
+            if (this._where) {
+              var where = this._where.toString();
+              if (where) {
+                s += ' WHERE ' + where;
+              }
+            }
             break;
 
           case TYPE_CREATE:
@@ -177,6 +191,30 @@
       }
     });
 
+    function UpdateFields(fields) {
+
+      // TODO: ensure incoming fields is an object
+      this._fields = fields || {};
+    }
+
+    _.extend(UpdateFields.prototype, {
+
+      set: function (field, value) {
+        this._fields[field] = value;
+        return this;
+      },
+
+      toString: function () {
+        var fields = [];
+        _.each(this._fields, function(val, key) {
+
+          // TODO: escape field values or use params pattern
+          fields.push(key + " = '" + val + "'");
+        });
+        return fields.join(', ');
+      }
+    });
+
     function ConditionBuilder(query) {
       this._parentQuery = query;
       this._type = 'where';
@@ -219,7 +257,7 @@
 
       value: function (value) {
 
-        // TODO: escape the value
+        // TODO: escape the value or use params pattern
         this['_field' + this._field] = "'" + value + "'";
         return this;
       },
@@ -264,6 +302,13 @@
       return new Query(TYPE_INSERT, _.toArray(arguments));
     }
 
+    function update(/* table */) {
+      if (arguments.length == 0) {
+        throw 'Missing update table';
+      }
+      return new Query(TYPE_UPDATE, _.toArray(arguments));
+    }
+
     function create(/* table */) {
       if (arguments.length == 0) {
         throw 'Missing create table';
@@ -274,7 +319,8 @@
     return {
       select: select,
       insert: insert,
-      create: create
+      create: create,
+      update: update
     }
   }
 

@@ -74,6 +74,22 @@ define(function(require) {
       expect(query.toString()).toEqual("INSERT INTO t1 (first, second, third) VALUES ('1', '2', '3')");
     });
 
+    it('can generate update query', function() {
+      var query = jaqb.update('t1');
+      query.field('first', 1);
+      expect(query.toString()).toEqual("UPDATE t1 SET first = '1'");
+
+      query = jaqb.update('t1');
+      query.field('first', 1);
+      query.field('second', 2).field('third', 3);
+      expect(query.toString()).toEqual("UPDATE t1 SET first = '1', second = '2', third = '3'");
+
+      query = jaqb.update('t1');
+      query.field('first', 1);
+      query.where().field('second').equals().value(2);
+      expect(query.toString()).toEqual("UPDATE t1 SET first = '1' WHERE second = '2'");
+    });
+
     it('can generate create table query', function() {
       var query = jaqb.create('t1');
       expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 ()');
