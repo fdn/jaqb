@@ -263,12 +263,22 @@
       },
 
       and: function () {
+
+        // NOOP
+        if (this._field == 1) {
+          return this;
+        }
         this._nextOperator = 'AND';
         this._nextCondition = new ConditionBuilder(this._parentQuery);
         return this._nextCondition;
       },
 
       or: function () {
+
+        // NOOP
+        if (this._field == 1) {
+          return this;
+        }
         this._nextOperator = 'OR';
         this._nextCondition = new ConditionBuilder(this._parentQuery);
         return this._nextCondition;

@@ -63,6 +63,25 @@ define(function(require) {
       );
     });
 
+    /**
+     * Convenience for looping to avoid checking for first condition
+     */
+    it('can handle extra condition operator', function() {
+      query = jaqb.select('t1');
+      var where = query.where().or();
+      where.field('first').equals().field('second');
+      expect(query.toString()).toEqual(
+        "SELECT * FROM t1 WHERE first = second"
+      );
+      query = jaqb.select('t1');
+      var where = query.where().or();
+      where.field('first').equals().field('second');
+      where.or().field('second').equals().field('third');
+      expect(query.toString()).toEqual(
+        "SELECT * FROM t1 WHERE first = second OR (second = third)"
+      );
+    });
+
     it('can generate insert query', function() {
       var query = jaqb.insert('t1');
       query.field('first', 1);
