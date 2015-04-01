@@ -121,6 +121,9 @@ define(function(require) {
 
       query.field('f3', 'INTEGER');
       expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 (f1 TEXT, f2 TEXT, f3 INTEGER)');
+
+      query.field('f3', 'DOUBLE');
+      expect(query.toString()).toEqual('CREATE TABLE IF NOT EXISTS t1 (f1 TEXT, f2 TEXT, f3 DOUBLE)');
     });
 
     it('can generate create table query with primary key', function() {

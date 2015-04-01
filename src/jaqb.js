@@ -166,18 +166,16 @@
       },
 
       set: function (field, type) {
+        if (typeof type === 'undefined') {
+          type = 'TEXT';
+        }
         switch (type) {
-          default:
-            type = 'TEXT';
-          case 'TEXT':
-          case 'INTEGER':
-          case 'BLOB':
-          case 'REAL':
-            break;
           case 'PRIMARY':
             type = 'INTEGER PRIMARY KEY';
             break;
 
+          // don't bother trying to enumerate types, pass through
+          default:
         }
         this._fields[field] = type;
       },
